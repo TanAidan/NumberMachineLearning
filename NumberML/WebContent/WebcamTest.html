@@ -1,5 +1,7 @@
+
 <!DOCTYPE html> 
 <html>
+
 <head>
 <meta charset = "utf-8">
 <title>Display Webcam Stream</title> 
@@ -27,61 +29,11 @@
 	
 	</video>
 	<button id="stop">Stop
+	
 	</button>
 </div>
-<script>
-var video = document.querySelector("#videoElement");
-var stop = document.querySelector("#stop");
-
-if (navigator.mediaDevices.getUserMedia){
-	navigator.mediaDevices.getUserMedia ({video : true})
-	.then(function(stream){
-		video.srcObject = stream;
-		var mediaRecorder = new MediaRecorder(stream);
-		mediaRecorder.start(2000);
-		console.log(mediaRecorder.state);
-		console.log("recorder started");
-		stop.onclick = function(){
-			mediaRecorder.stop();
-			console.log("recorder stopped");
-		}
-		mediaRecorder.ondataavailable = function(e){
-			console.log(e);
-			console.log(e.data.size);
-			
-		}
-	})
-	.catch(function (err0r){
-		console.log("Something went wrong!");
-	});
-}
-</script>
-
-<script > //Vainavi's code
-	function getVideoImage(path, secs, callback){
-		var me = this, video = document.querySelector("#videoElement"); //not sure if this is right
-		video.onloadedmetadata = function(){
-			if ('function' === typeof secs){
-				secs = secs(this.duration);
-			}
-			this.currentTime = Math.min(Math.max(0, (secs <0 ? this.duration : 0) + secs), this.duration);
-		};
-		video.onseeked = function(e){
-			var canvas = document.createElement('canvas');
-			canvas.height = video.videoHeight;
-			canvas.width = video.videoWidth;
-			var ctx = canvas.getContext('2d');
-			ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-			var img = new Image();
-			img.src =canvas.toDatURL();
-			callback.call(me, img, this.currentTime);
-		};
-		video.onerror = function(e) {
-			callback.call(me, undefined, undefined, e);
-		};
-		video.src = path;
-	}
-</script>
+<script type="application/javascript" src="scripts/VideoLoader.js"></script>
+<script type ="application/javascript" src = "https://cdn.jsdelivr.net/npm/libsvm-js@0.2.1/dist/browser/wasm/libsvm.js">  </script>
 </body>
 
 </html>
