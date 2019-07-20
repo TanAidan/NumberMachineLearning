@@ -1,7 +1,7 @@
 
 //copy video into a canvas, read intensities of pixels, and downsample the image (0-255 gray/5x5)
 //lib svm
-
+/*//AIDAN'S CODE
 async function xor() {
     const SVM = await
     require('https://cdn.jsdelivr.net/npm/libsvm-js@0.2.1/dist/browser/wasm/libsvm.js'); //getting the link to download
@@ -23,38 +23,40 @@ async function xor() {
     console.log(predictedLabel) // 0
 }
 
-xor().then(() => console.log('done!'));
-
+xor().then(() => console.log('done!'));*/
+//Vainavi's code
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var video = document.querySelector("#videoElement");  // gets tag from html page
 var stop = document.querySelector("#stop");
+var canvas = document.querySelector('#canvas');
+var ctx = canvas.getContext('2d');
 
 if (navigator.mediaDevices.getUserMedia){  //checking to see if method exists
 	navigator.mediaDevices.getUserMedia ({video : true})
 	.then(function(stream){  //passing in the stream that the method returns              
 		video.srcObject = stream;
-		var mediaRecorder = new MediaRecorder(stream);
-		mediaRecorder.start(2000);
-		console.log(mediaRecorder.state);
-		console.log("recorder started");
-		stop.onclick = function(){
-			mediaRecorder.stop();
-			console.log("recorder stopped");
-		}
-		mediaRecorder.ondataavailable = function(e){
-			console.log(e);
-			console.log(e.data.size);
-			
-		}
+		video.addEventListener('canplay', function(){
+			console.log("running video on seeked");
+			canvas.height = video.videoHeight;
+			canvas.width = video.videoHeight;
+			window.setInterval(function(){
+				ctx.drawImage(video, -80, 0, video.videoWidth, canvas.height);
+				ctx.scale(0.5, 0.5);
+				imageData = ctx.getImageData(0,0, canvas.width, canvas.height);
+				console.log(imageData.data.length);
+			}, 100);
+			//var img = new Image();
+			//img.src =canvas.toDatURL();
+			//ctx.drawImage(img, 100, 100, canvas.width, canvas.height);
+		});
 	})
+	
 	.catch(function (err0r){
 		console.log(err0r);
 		console.log("Something went wrong!");
 	});
 }
 
-
-//Vainavi's code
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	function getVideoImage(path, secs, callback){
 		var me = this, video = document.querySelector("#videoElement"); //not sure if this is right
 		video.onloadedmetadata = function(){
@@ -63,16 +65,7 @@ if (navigator.mediaDevices.getUserMedia){  //checking to see if method exists
 			}
 			this.currentTime = Math.min(Math.max(0, (secs <0 ? this.duration : 0) + secs), this.duration);
 		};
-		video.onseeked = function(e){
-			var canvas = document.createElement('canvas');
-			canvas.height = video.videoHeight;
-			canvas.width = video.videoWidth;
-			var ctx = canvas.getContext('2d');
-			ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-			var img = new Image();
-			img.src =canvas.toDatURL();
-			callback.call(me, img, this.currentTime);
-		};
+		
 		video.onerror = function(e) {
 			callback.call(me, undefined, undefined, e);
 		};
