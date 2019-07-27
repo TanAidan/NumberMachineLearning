@@ -30,20 +30,36 @@ var video = document.querySelector("#videoElement");  // gets tag from html page
 var stop = document.querySelector("#stop");
 var canvas = document.querySelector('#canvas');
 var ctx = canvas.getContext('2d');
-
+var bnw_array = new Array(64);
 if (navigator.mediaDevices.getUserMedia){  //checking to see if method exists
 	navigator.mediaDevices.getUserMedia ({video : true})
 	.then(function(stream){  //passing in the stream that the method returns              
 		video.srcObject = stream;
 		video.addEventListener('canplay', function(){
 			console.log("running video on seeked");
-			canvas.height = video.videoHeight;
-			canvas.width = video.videoHeight;
+			canvas.height = 8;
+			canvas.width = 8;
 			window.setInterval(function(){
-				ctx.drawImage(video, -80, 0, video.videoWidth, canvas.height);
-				ctx.scale(0.5, 0.5);
+				ctx.drawImage(video, -1.3333, 0, 10.667, canvas.height);
+				//ctx.scale(0.5, 0.5);
 				imageData = ctx.getImageData(0,0, canvas.width, canvas.height);
-				console.log(imageData.data.length);
+				
+				var counter = 3;
+				var index = 0;
+				for(var i =0; i<imageData.data.length; i++){
+					if(counter==3){
+						bnw_array[index] = 15 - Math.floor(((0.21* imageData.data[i]) + (0.72*imageData.data[i+1]) + (0.07*imageData.data[i+2]))/16);
+						counter = 0;
+						index = index+1;
+					}
+					else{
+						counter = counter +1;
+					}
+					
+				}
+				console.log(bnw_array.length);
+				console.log(bnw_array);
+				
 			}, 100);
 			//var img = new Image();
 			//img.src =canvas.toDatURL();
@@ -107,4 +123,5 @@ if (navigator.mediaDevices.getUserMedia){  //checking to see if method exists
 	    }
 	    return exports; //require returns object exported by module
 	}
+	
 	///- END REQUIRE FN
