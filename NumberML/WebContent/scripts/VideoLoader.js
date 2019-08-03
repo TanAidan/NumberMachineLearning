@@ -5,6 +5,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	///- REQUIRE FN
 	// equivalent to require from node.js
+
+
 	function require(url){
 	    if (url.toLowerCase().substr(-3)!=='.js') url+='.js'; // to allow loading without js suffix;
 	    if (!require.cache) require.cache=[]; //init cache
@@ -48,67 +50,66 @@ async function xor() {
         gamma: 0.001,                     // RBF kernel gamma parameter
         cost: 1                       // C_SVC cost parameter
     });
-
-    // This is the xor problem
-    //
-    //  1  0
-    //  0  1
-    const features = [[0, 0], [1, 1], [1, 0], [0, 1]];
-    const labels = [0, 0, 1, 1];
     svm.train(features, labels);  // train the model
-    const predictedLabel = svm.predictOne([0.7, 0.8]);
-    console.log(predictedLabel) // 0
+    
+    if (navigator.mediaDevices.getUserMedia){  //checking to see if method exists
+    	navigator.mediaDevices.getUserMedia ({video : true})
+    	.then(function(stream){  //passing in the stream that the method returns              
+    		video.srcObject = stream;
+    		video.addEventListener('canplay', function(){
+    			console.log("running video on seeked");
+    			canvas.height = 8;
+    			canvas.width = 8;
+    			window.setInterval(function(){
+    				ctx.drawImage(video, -1.3333, 0, 10.667, canvas.height);
+    				//ctx.scale(0.5, 0.5);
+    				imageData = ctx.getImageData(0,0, canvas.width, canvas.height);
+    				
+    				var counter = 3;
+    				var index = 0;
+    				for(var i =0; i<imageData.data.length; i++){
+    					if(counter==3){
+    						bnw_array[index] = 15 - Math.floor(((0.21* imageData.data[i]) + (0.72*imageData.data[i+1]) + (0.07*imageData.data[i+2]))/16);
+    						counter = 0;
+    						index = index+1;
+    					}
+    					else{
+    						counter = counter +1;
+    					}
+    					
+    				}
+    				
+    				const predictedLabel = svm.predictOne(bnw_array);
+    				//console.log(predictedLabel)
+    				numDisplay.innerHTML = predictedLabel;
+    				//console.log(bnw_array.length);
+    				//console.log(bnw_array);
+    				
+    			}, 100);
+    			//var img = new Image();
+    			//img.src =canvas.toDatURL();
+    			//ctx.drawImage(img, 100, 100, canvas.width, canvas.height);
+    		});
+    	})
+    	
+    	.catch(function (err0r){
+    		console.log(err0r);
+    		console.log("Something went wrong!");
+    	});
+    }
+    
+   
 }
 
 xor().then(() => console.log('done!'));
 //Vainavi's code
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 var video = document.querySelector("#videoElement");  // gets tag from html page
-var stop = document.querySelector("#stop");
-var canvas = document.querySelector('#canvas');
+var canvas = document.createElement('canvas');
+var numDisplay = document.querySelector("#numDisplay"); // gets numDisplay tag from html
 var ctx = canvas.getContext('2d');
 var bnw_array = new Array(64);
-if (navigator.mediaDevices.getUserMedia){  //checking to see if method exists
-	navigator.mediaDevices.getUserMedia ({video : true})
-	.then(function(stream){  //passing in the stream that the method returns              
-		video.srcObject = stream;
-		video.addEventListener('canplay', function(){
-			console.log("running video on seeked");
-			canvas.height = 8;
-			canvas.width = 8;
-			window.setInterval(function(){
-				ctx.drawImage(video, -1.3333, 0, 10.667, canvas.height);
-				//ctx.scale(0.5, 0.5);
-				imageData = ctx.getImageData(0,0, canvas.width, canvas.height);
-				
-				var counter = 3;
-				var index = 0;
-				for(var i =0; i<imageData.data.length; i++){
-					if(counter==3){
-						bnw_array[index] = 15 - Math.floor(((0.21* imageData.data[i]) + (0.72*imageData.data[i+1]) + (0.07*imageData.data[i+2]))/16);
-						counter = 0;
-						index = index+1;
-					}
-					else{
-						counter = counter +1;
-					}
-					
-				}
-				console.log(bnw_array.length);
-				console.log(bnw_array);
-				
-			}, 100);
-			//var img = new Image();
-			//img.src =canvas.toDatURL();
-			//ctx.drawImage(img, 100, 100, canvas.width, canvas.height);
-		});
-	})
-	
-	.catch(function (err0r){
-		console.log(err0r);
-		console.log("Something went wrong!");
-	});
-}
+
 
 	function getVideoImage(path, secs, callback){
 		var me = this, video = document.querySelector("#videoElement"); //not sure if this is right
@@ -124,4 +125,5 @@ if (navigator.mediaDevices.getUserMedia){  //checking to see if method exists
 		};
 		video.src = path;
 	}
+
 	
